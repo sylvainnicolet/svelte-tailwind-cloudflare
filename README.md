@@ -1,38 +1,137 @@
-# create-svelte
+# How to to setup Svelte, TailwindCSS, DaisyUI and deploy to Cloudflare
 
-Everything you need to build a Svelte project, powered by [`create-svelte`](https://github.com/sveltejs/kit/tree/master/packages/create-svelte).
+Welcome to this small tutorial on how to setup SvelteKit, TailwindCSS, DaisyUI and deploy to Cloudflare.
 
-## Creating a project
+![Cover](./documentation/cover.png)
 
-If you're seeing this, you've probably already done this step. Congrats!
+## Prerequisites
+- NodeJS (https://nodejs.org/en/)
+- PNPM (https://pnpm.io/installation)
+- Git (https://git-scm.com/downloads)
+- Github Account (https://github.com/signup)
+- Cloudflare Account (https://dash.cloudflare.com/sign-up)
 
+## Create a new SvelteKit project
 ```bash
-# create a new project in the current directory
-npm create svelte@latest
-
-# create a new project in my-app
-npm create svelte@latest my-app
+pnpm create svelte@latest your-app
 ```
 
-## Developing
-
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
-
+You will be guided through the setup process. Choose whatever you need.
+After the installation, navigate into your project folder.
 ```bash
-npm run dev
-
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
+cd your-app
+```
+Install all dependencies.
+```bash
+pnpm install
+```
+Finally, start the development server.
+```bash
+pnpm run dev --open
 ```
 
-## Building
-
-To create a production version of your app:
-
+## Install TailwindCSS and DaisyUI
+Install TailwindCSS and DaisyUI.
 ```bash
-npm run build
+pnpm add -D tailwindcss postcss autoprefixer daisyui
 ```
 
-You can preview the production build with `npm run preview`.
+Create a TailwindCSS configuration file.
+```bash
+pnpx tailwindcss init -p
+```
 
-> To deploy your app, you may need to install an [adapter](https://kit.svelte.dev/docs/adapters) for your target environment.
+In your `svelte.config.js` file, if it not already done, import `vitePreprocess` to enable processing as PostCSS.
+```js
+import adapter from '@sveltejs/adapter-auto';
+import { vitePreprocess } from '@sveltejs/kit/vite';
+
+const config = {
+	preprocess: vitePreprocess(),
+
+	kit: {
+		adapter: adapter()
+	}
+};
+
+export default config;
+```
+
+Update your `tailwind.config.js` file to include the DaisyUI plugin and include the paths to all of your template files.
+```js
+export default {
+  content: ['./src/**/*.{html,js,svelte,ts}'],
+  theme: {
+    extend: {},
+  },
+  plugins: [require('daisyui')],
+  daisyui: {
+    themes: ["light", "dark"],
+  },
+}
+```
+
+Create a `./src/app.css` file and add the @tailwind directives.
+```css
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+```
+
+Import the `./src/app.css` file in your `./src/routes/+layout.svelte` file.
+```html
+<script>
+  import '../app.css';
+</script>
+```
+
+Now you can use TailwindCSS and DaisyUI in your SvelteKit project!
+
+## Deploy to Cloudflare
+
+### Use the Cloudflare adapter
+Install the `@sveltejs/adapter-cloudflare` package.
+```bash
+pnpm add -D @sveltejs/adapter-cloudflare
+```
+
+Update your `svelte.config.js` file to use the Cloudflare adapter.
+```js
+import adapter from '@sveltejs/adapter-cloudflare';
+import { vitePreprocess } from '@sveltejs/kit/vite';
+
+const config = {
+	preprocess: vitePreprocess(),
+
+	kit: {
+		adapter: adapter()
+	}
+};
+
+export default config;
+```
+
+### Setup a Github repository
+
+Create a new repository on Github and follow the instructions to push your local repository to Github.
+
+### Setup a Cloudflare Pages project
+
+Create a new project on Cloudflare Pages and follow the instructions to connect your Github repository.
+
+![Cloudflare Pages](./documentation/image_1.jpg)
+
+Set up the build settings.
+
+![Cloudflare Pages](./documentation/image_2.jpg)
+
+Don't forget to set the `NODE_VERSION` environment variable to `16`.
+
+![Cloudflare Pages](./documentation/image_3.jpg)
+
+Finally, click on the `Save and Deploy` button.
+
+
+## Conclusion
+
+That's it! You have now a SvelteKit project with TailwindCSS, DaisyUI and deployed to Cloudflare Pages!
